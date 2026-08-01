@@ -1,9 +1,9 @@
 const CACHE_PREFIX='riyoshi-lawbook-';
-const APP_VERSION='4.0.46';
-const CACHE=CACHE_PREFIX+'v4-0-46';
+const APP_VERSION='4.0.47';
+const CACHE=CACHE_PREFIX+'v4-0-47';
 const LEGACY_CACHE_PREFIXES=['riyo-kakomon-','riyoushi-9laws-final-'];
 const VERSION_QUERY=`?v=${APP_VERSION}`;
-const ASSETS=['./','./index.html',`./index.html${VERSION_QUERY}`,`./style.css${VERSION_QUERY}`,`./app.js${VERSION_QUERY}`,`./lawAudit.js${VERSION_QUERY}`,`./officialQuestionsData.js${VERSION_QUERY}`,`./lawArticleData.js${VERSION_QUERY}`,`./commercialLawData.js${VERSION_QUERY}`,`./lawMasterData.js${VERSION_QUERY}`,`./manifest.webmanifest${VERSION_QUERY}`,`./icon-180.png${VERSION_QUERY}`,`./icon-192.png${VERSION_QUERY}`,`./icon-512.png${VERSION_QUERY}`,`./分野別問題/data.js${VERSION_QUERY}`,`./preview.html${VERSION_QUERY}`];
+const ASSETS=['./','./index.html',`./index.html${VERSION_QUERY}`,`./style.css${VERSION_QUERY}`,`./app.js${VERSION_QUERY}`,`./lawAudit.js${VERSION_QUERY}`,`./auditCorrections.js${VERSION_QUERY}`,`./officialQuestionsData.js${VERSION_QUERY}`,`./lawArticleData.js${VERSION_QUERY}`,`./commercialLawData.js${VERSION_QUERY}`,`./lawMasterData.js${VERSION_QUERY}`,`./manifest.webmanifest${VERSION_QUERY}`,`./icon-180.png${VERSION_QUERY}`,`./icon-192.png${VERSION_QUERY}`,`./icon-512.png${VERSION_QUERY}`,`./分野別問題/data.js${VERSION_QUERY}`,`./preview.html${VERSION_QUERY}`];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>(key.startsWith(CACHE_PREFIX)&&key!==CACHE)||LEGACY_CACHE_PREFIXES.some(prefix=>key.startsWith(prefix))).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting()});

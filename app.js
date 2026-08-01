@@ -1,7 +1,7 @@
 const app=document.getElementById('app');
 const headerBack=document.getElementById('headerBack');
 const headerHome=document.getElementById('headerHome');
-const APP_VERSION='4.0.46';
+const APP_VERSION='4.0.47';
 const PROG_KEY='riyo_v05_prog';
 const BOOKMARK_KEY='riyoshi_lawbook_bookmarks_v1';
 const TODAY_KEY='riyoshi_lawbook_today10_v1';
@@ -124,11 +124,15 @@ function articleGroups(){
       const sourceArticle=typeof LAW_ARTICLE_DATA==='object'?LAW_ARTICLE_DATA[reference]:null;
       const article=sourceArticle||staticByReference.get(reference)||{};
       const source=normaliseLegalSource(article.sourceText);
-      const questionIds=LAW_QUESTIONS.filter(question=>LAW_QUESTION_ARTICLE_LINKS?.[question.id]===reference).map(question=>question.id);
+      const questionIds=LAW_QUESTIONS.filter(question=>articleReferencesForQuestion(question.id).includes(reference)).map(question=>question.id);
       return{reference,sources:source?[source]:[],points:[...(article.points||[])],explanations:[...(article.explanation||article.explanations||[])],questionIds};
     });
     return {...law,articles};
   });
+}
+function articleReferencesForQuestion(id){
+  const value=LAW_QUESTION_ARTICLE_LINKS?.[id];
+  return(Array.isArray(value)?value:[value]).filter(reference=>typeof reference==='string'&&reference);
 }
 const laws=articleGroups();
 function latest(q){const s=prog.answerStats?.[q.id];if(!s||!s.try)return'unanswered';return s.lastResult===false?'wrong':'correct'}
@@ -137,7 +141,7 @@ function questionsForLaw(law){
   const questions=LAW_QUESTIONS.filter(q=>law.categories.includes(q.category));
   if(law.id!=='barber_related')return questions;
   const disinfectionRefs=new Set(DISINFECTION_LAW_REFS);
-  return questions.filter(q=>!disinfectionRefs.has(LAW_QUESTION_ARTICLE_LINKS?.[q.id]));
+  return questions.filter(q=>!articleReferencesForQuestion(q.id).some(reference=>disinfectionRefs.has(reference)));
 }
 function statsForLaw(law){const qs=questionsForLaw(law),correct=qs.filter(q=>latest(q)==='correct').length,wrong=qs.filter(q=>latest(q)==='wrong').length;return{total:qs.length,correct,wrong,unanswered:qs.length-correct-wrong}}
 function lawsForSubject(subject){const ids=new Set(subject.lawIds);return laws.map((law,index)=>({law,index})).filter(row=>ids.has(row.law.id))}
@@ -278,7 +282,7 @@ function renderHome(){
       <div class="home-result-legend"><span class="correct">正答 ${all.correct}</span><span class="wrong">誤答 ${all.wrong}</span><span class="unanswered">未回答 ${all.unanswered}</span></div>
     </div></section>
     <div class="today-wrap"><button class="today-start" onclick="LawBook.startToday()"><span class="check">✓</span><span><strong>${todayTitle}</strong><small>${todayCaption}</small></span></button><button class="today-bookmarks" onclick="LawBook.openBookmarks()"><span>🔖</span><span class="count">${bookmarks.size}</span></button></div>
-    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.46">新制度による筆記試験実施要領</a></div>
+    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.47">新制度による筆記試験実施要領</a></div>
     <section class="subject-list">${SUBJECT_DEFS.map(subjectEntryHtml).join('')}</section>
     <section class="home-law-search">
       <label for="lawSearchInput">法令・条文・問題検索</label>
@@ -381,7 +385,7 @@ function formatNumberedParagraph(text){
 function trimBulletPeriod(text){return String(text||'').trim().replace(/[。．]\s*$/,'')}
 function explanationField(source,label){
   const labels='判断基準|根拠|注意点';
-  const match=source.match(new RegExp(`(?:^|\\n)[・●]?\\s*${label}[：:]\\s*([\\s\\S]*?)(?=\\n[・●]?\\s*(?:${labels})[：:]|$)`));
+  const match=source.match(new RegExp(`(?:^|\\n)(?:■${label}■|[・●]?\\s*${label}[：:])\\s*([\\s\\S]*?)(?=\\n(?:■(?:${labels})■|[・●]?\\s*(?:${labels})[：:])|$)`));
   return match?match[1].trim():'';
 }
 function formatAnswerExplanation(q){
@@ -491,7 +495,7 @@ function renderQuestion({preserveScroll=false}={}){
   app.innerHTML=`${showNotice?`<div class="answer-notice ${answer.ok?'is-correct':'is-wrong'}" role="status">${answer.ok?'正解！':'残念！'}</div>`:''}${head(heading)}<div class="study-progress"><i style="width:${progress}%"></i></div>
   <article class="question-card"><button class="question-bookmark${bookmarks.has(q.id)?' is-on':''}" onclick="LawBook.toggleBookmark(${q.id})">🔖</button><span class="question-number">問題 ${q.id}</span><h2>${esc(q.q)}</h2>
   <div class="choices">${q.choices.map((choice,i)=>`<button class="choice${answer?(i===q.answer?' correct':i===answer.choice?' wrong':''):''}" ${answer?'disabled':''} onclick="LawBook.answer(${i})">${i+1}．${esc(choice)}</button>`).join('')}</div>
-  ${answer?`<section class="answer-box"><h3>${answer.ok?'正解':'不正解'}・解説</h3><div class="answer-explanation">${formatAnswerExplanation(q)}</div><button class="secondary-button" onclick="LawBook.openSourceArticle(${q.id})">根拠条文を確認する</button></section>`:''}</article>
+  ${answer?`<section class="answer-box"><h3>${answer.ok?'正解':'不正解'}・解説</h3><div class="answer-explanation">${formatAnswerExplanation(q)}</div>${sourceArticleButtons(q.id,'根拠条文を確認する')}</section>`:''}</article>
   <nav class="question-nav"><span class="question-nav-progress">${sessionIndex+1}／${session.length}問</span><button onclick="LawBook.previousQuestion()" ${sessionIndex===0?'disabled':''}>＜前へ</button><button onclick="LawBook.nextQuestion()">${sessionIndex===session.length-1?'結果を見る＞':'次へ＞'}</button></nav>`;
   if(preserveScroll)requestAnimationFrame(()=>window.scrollTo(0,savedScroll));
 }
@@ -541,9 +545,20 @@ function nextQuestion(){answerNoticeId=null;if(sessionIndex<session.length-1){se
 function renderResult(){answerNoticeId=null;saveTodaySession();setScreen('result');const rows=session.map(q=>({q,a:sessionAnswers[q.id]})),ok=rows.filter(x=>x.a?.ok).length,wrong=rows.filter(x=>x.a&&!x.a.ok),unanswered=rows.filter(x=>!x.a).length;app.innerHTML=`${head('結果')}<section class="result-card"><div class="result-totals"><div><strong>${ok}</strong>正答</div><div><strong>${wrong.length}</strong>誤答</div>${unanswered?`<div><strong>${unanswered}</strong>未回答</div>`:''}</div><div class="result-list">${rows.map(x=>`<div class="result-row"><span class="${x.a?(x.a.ok?'ok':'ng'):''}">${x.a?(x.a.ok?'○':'×'):'－'}</span><span>問題 ${x.q.id}　${esc(x.q.q.replace(/\s+/g,' ').slice(0,48))}</span></div>`).join('')}</div>${wrong.length?`<button class="primary-button" onclick="LawBook.retryWrong()">誤答だけ解き直す</button>`:''}${sessionSource==='today'&&hasNextTodaySet()?'<button class="primary-button" onclick="LawBook.startNextToday()">次の10問へ</button>':''}<button class="secondary-button" onclick="LawBook.openBookmarks()">ブックマークした問題を確認する</button><button class="secondary-button" onclick="LawBook.home()">ホームに戻る</button></section>`}
 function retryWrong(){const ids=session.filter(q=>sessionAnswers[q.id]&&!sessionAnswers[q.id].ok).map(q=>q.id);startSession(ids,'retry','result')}
 function toggleBookmark(id){id=Number(id);bookmarks.has(id)?bookmarks.delete(id):bookmarks.add(id);writeJson(BOOKMARK_KEY,[...bookmarks]);if(screen==='question')renderQuestion();else if(screen==='bookmarks')openBookmarks();else renderHome()}
-function findArticleForQuestion(id){for(let li=0;li<laws.length;li++){for(let ai=0;ai<laws[li].articles.length;ai++)if(laws[li].articles[ai].questionIds.includes(Number(id)))return{li,ai}}return null}
-function openSourceArticle(id){const hit=findArticleForQuestion(id);if(!hit)return;const source=screen==='bookmarks'?'bookmarks':'question';lawIndex=hit.li;articleIndex=hit.ai;openArticle(hit.ai,source)}
-function openBookmarks(){setScreen('bookmarks');app.innerHTML=`${head('ブックマーク問題')}<section class="bookmark-list">${bookmarks.size?[...bookmarks].map(id=>qById.get(id)).filter(Boolean).map(q=>{const law=LAW_DEFS.find(l=>l.categories.includes(q.category));return `<details class="bookmark-item"><summary><span>${esc(q.q.replace(/\s+/g,' ').slice(0,58))}</span><small>問題 ${q.id}</small></summary><div class="bookmark-body"><h3>選択肢</h3><ol>${q.choices.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><h3>正答</h3><p>${esc(q.choices[q.answer])}</p><h3>解説</h3><div class="answer-explanation">${formatAnswerExplanation(q)}</div><h3>関連法令</h3><p>${esc(law?.name||'')}　${esc(q.point||'')}</p><div class="bookmark-actions"><button class="remove" onclick="LawBook.toggleBookmark(${q.id})">解除</button><button class="open" onclick="LawBook.openSourceArticle(${q.id})">この条文を開く</button></div></div></details>`}).join(''):'<div class="empty">登録した問題はありません。</div>'}</section>`}
+function articlesForQuestion(id){
+  const references=articleReferencesForQuestion(id),hits=[];
+  for(const reference of references)for(let li=0;li<laws.length;li++){
+    const ai=laws[li].articles.findIndex(article=>article.reference===reference);
+    if(ai>=0&&!hits.some(hit=>hit.li===li&&hit.ai===ai)){hits.push({li,ai,reference});break}
+  }
+  return hits;
+}
+function sourceArticleButtons(id,label){
+  const hits=articlesForQuestion(id);
+  return hits.map((hit,index)=>`<button class="secondary-button" onclick="LawBook.openSourceArticle(${Number(id)},${index})">${esc(hits.length>1?`${label}（${index+1}）`:label)}</button>`).join('');
+}
+function openSourceArticle(id,index=0){const hit=articlesForQuestion(id)[Number(index)||0];if(!hit)return;const source=screen==='bookmarks'?'bookmarks':'question';lawIndex=hit.li;articleIndex=hit.ai;openArticle(hit.ai,source)}
+function openBookmarks(){setScreen('bookmarks');app.innerHTML=`${head('ブックマーク問題')}<section class="bookmark-list">${bookmarks.size?[...bookmarks].map(id=>qById.get(id)).filter(Boolean).map(q=>{const law=LAW_DEFS.find(l=>l.categories.includes(q.category));return `<details class="bookmark-item"><summary><span>${esc(q.q.replace(/\s+/g,' ').slice(0,58))}</span><small>問題 ${q.id}</small></summary><div class="bookmark-body"><h3>選択肢</h3><ol>${q.choices.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><h3>正答</h3><p>${esc(q.choices[q.answer])}</p><h3>解説</h3><div class="answer-explanation">${formatAnswerExplanation(q)}</div><h3>関連法令</h3><p>${esc(law?.name||'')}　${esc(q.point||'')}</p><div class="bookmark-actions"><button class="remove" onclick="LawBook.toggleBookmark(${q.id})">解除</button>${sourceArticleButtons(q.id,"この条文を開く")}</div></div></details>`}).join(''):'<div class="empty">登録した問題はありません。</div>'}</section>`}
 function exportBackup(){saveProg();const payload={format:'riyoshi-lawbook-backup',version:5,exportedAt:new Date().toISOString(),progress:prog,bookmarks:[...bookmarks],today:readJson(TODAY_KEY,{}),roundHistory,textEnlarged,legacy:{mockProgress:readJson(MOCK_PROGRESS_KEY,null),materialDone:readJson(MATERIAL_DONE_KEY,[]),materialWeak:readJson(MATERIAL_WEAK_KEY,[])}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`法令集バックアップ-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 async function importBackup(file){if(!file)return;try{const p=JSON.parse(await file.text());if(!p||p.format!=='riyoshi-lawbook-backup'||![1,2,3,4,5].includes(p.version)||!p.progress||!Array.isArray(p.bookmarks))throw new Error('形式が一致しません');if(!confirm('現在の学習記録を、選択したバックアップ内容で置き換えます。よろしいですか？'))return;prog=normaliseProgress(p.progress);bookmarks=new Set(p.bookmarks.map(Number).filter(id=>officialById.has(id)));roundHistory=normaliseRoundHistory(p.version>=3?p.roundHistory:{});textEnlarged=typeof p.textEnlarged==='boolean'?p.textEnlarged:textEnlarged;saveProg();writeJson(BOOKMARK_KEY,[...bookmarks]);writeJson(TODAY_KEY,p.today||{});writeJson(ROUND_HISTORY_KEY,roundHistory);if(p.version>=2&&p.legacy){p.legacy.mockProgress?writeJson(MOCK_PROGRESS_KEY,p.legacy.mockProgress):localStorage.removeItem(MOCK_PROGRESS_KEY);writeJson(MATERIAL_DONE_KEY,Array.isArray(p.legacy.materialDone)?p.legacy.materialDone:[]);writeJson(MATERIAL_WEAK_KEY,Array.isArray(p.legacy.materialWeak)?p.legacy.materialWeak:[])}localStorage.setItem(TEXT_KEY,textEnlarged?'1':'0');document.body.classList.toggle('text-enlarged',textEnlarged);renderHome();alert('バックアップを読み込みました。')}catch(e){alert(`バックアップを読み込めませんでした。${e.message?' '+e.message:''}`)}}
 function rebuildDerivedProgress(){
@@ -649,7 +664,7 @@ async function registerCurrentServiceWorker(){
         .filter(registration=>legacyScopes.includes(registration.scope))
         .map(registration=>registration.unregister()));
     }
-    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.46',{updateViaCache:'none'});
+    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.47',{updateViaCache:'none'});
     const activateWaitingWorker=()=>{
       if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
     };
