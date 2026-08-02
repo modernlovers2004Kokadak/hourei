@@ -12,7 +12,7 @@ const normaliseReference=value=>String(value??'')
   .replace(/[）)]/g,')')
   .trim();
 const text=value=>String(value??'').replace(/\s+/g,'').trim();
-const arrays=value=>Array.isArray(value)?value:[];
+const arrays=value=>Array.isArray(value)?value:[value];
 const unique=values=>[...new Set(values)];
 
 function run(){
@@ -58,13 +58,17 @@ function run(){
 
   for(const question of questions){
     const id=String(question?.id??'');
-    const reference=links[id];
-    if(!reference){
+    const references=arrays(links[id]).filter(reference=>typeof reference==='string'&&reference);
+    if(!references.length){
       add(errors,'ARTICLE_LINK_MISSING',`問題${id}に条文・項目の参照先がありません`,{questionId:id});
-    }else if(!masterReferenceSet.has(reference)){
-      add(errors,'ARTICLE_LINK_BROKEN',`問題${id}の参照先「${reference}」が法令マスターにありません`,{
-        questionId:id,reference
-      });
+    }else{
+      for(const reference of references){
+        if(!masterReferenceSet.has(reference)){
+          add(errors,'ARTICLE_LINK_BROKEN',`問題${id}の参照先「${reference}」が法令マスターにありません`,{
+            questionId:id,reference
+          });
+        }
+      }
     }
   }
   for(const id of Object.keys(links)){
@@ -73,7 +77,7 @@ function run(){
     }
   }
 
-  const linkedReferences=new Set(Object.values(links));
+  const linkedReferences=new Set(Object.values(links).flatMap(arrays));
   for(const {lawId,reference} of masterRows){
     const article=articleData[reference]||commercialByRef.get(reference)||{};
     const source=text(article.sourceText);
@@ -118,15 +122,17 @@ function run(){
       );
     }
   }
-  for(const [id,reference] of Object.entries(links)){
-    const canonical=normaliseReference(reference);
-    const exact=masterReferenceSet.has(reference);
-    const canonicalMatches=masterRows.filter(row=>normaliseReference(row.reference)===canonical);
-    if(!exact&&canonicalMatches.length){
-      add(warnings,'LINK_REFERENCE_VARIANT',
-        `問題${id}の参照表記を「${canonicalMatches[0].reference}」へ統一できます`,
-        {questionId:String(id),reference,suggested:canonicalMatches[0].reference}
-      );
+  for(const [id,value] of Object.entries(links)){
+    for(const reference of arrays(value)){
+      const canonical=normaliseReference(reference);
+      const exact=masterReferenceSet.has(reference);
+      const canonicalMatches=masterRows.filter(row=>normaliseReference(row.reference)===canonical);
+      if(!exact&&canonicalMatches.length){
+        add(warnings,'LINK_REFERENCE_VARIANT',
+          `問題${id}の参照表記を「${canonicalMatches[0].reference}」へ統一できます`,
+          {questionId:String(id),reference,suggested:canonicalMatches[0].reference}
+        );
+      }
     }
   }
 

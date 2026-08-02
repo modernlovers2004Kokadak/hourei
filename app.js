@@ -1,7 +1,7 @@
 const app=document.getElementById('app');
 const headerBack=document.getElementById('headerBack');
 const headerHome=document.getElementById('headerHome');
-const APP_VERSION='4.0.48';
+const APP_VERSION='4.0.56';
 const PROG_KEY='riyo_v05_prog';
 const BOOKMARK_KEY='riyoshi_lawbook_bookmarks_v1';
 const TODAY_KEY='riyoshi_lawbook_today10_v1';
@@ -31,7 +31,7 @@ const LAW_DEFS=[
   {id:'cosmetics',name:'香粧品',color:'#8a6b35',group:'non_law',categories:['cosmetics']},
   {id:'history',name:'文化論',color:'#6a709b',group:'non_law',categories:['history']},
   {id:'shop',name:'運営管理',color:'#3f806d',group:'non_law',categories:['shop']},
-  {id:'cut',name:'カッティング',color:'#a45d4d',group:'non_law',categories:['cut']},
+  {id:'cut',name:'カッティング',color:'#a45d4d',group:'non_law',categories:['cut','barbering_theory_general']},
   {id:'shaving',name:'シェービング',color:'#56768c',group:'non_law',categories:['shaving']}
 ];
 const SUBJECT_DEFS=[
@@ -125,7 +125,7 @@ function articleGroups(){
       const article=sourceArticle||staticByReference.get(reference)||{};
       const source=normaliseLegalSource(article.sourceText);
       const questionIds=LAW_QUESTIONS.filter(question=>articleReferencesForQuestion(question.id).includes(reference)).map(question=>question.id);
-      return{reference,sources:source?[source]:[],points:[...(article.points||[])],explanations:[...(article.explanation||article.explanations||[])],questionIds};
+      return{reference,sources:source?[source]:[],points:[...(article.points||[])],explanations:[...(article.explanation||article.explanations||[])],displayType:article.displayType||'article',questionIds};
     });
     return {...law,articles};
   });
@@ -282,7 +282,7 @@ function renderHome(){
       <div class="home-result-legend"><span class="correct">正答 ${all.correct}</span><span class="wrong">誤答 ${all.wrong}</span><span class="unanswered">未回答 ${all.unanswered}</span></div>
     </div></section>
     <div class="today-wrap"><button class="today-start" onclick="LawBook.startToday()"><span class="check">✓</span><span><strong>${todayTitle}</strong><small>${todayCaption}</small></span></button><button class="today-bookmarks" onclick="LawBook.openBookmarks()"><span>🔖</span><span class="count">${bookmarks.size}</span></button></div>
-    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.48">新制度による筆記試験実施要領</a></div>
+    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.56">新制度による筆記試験実施要領</a></div>
     <section class="subject-list">${SUBJECT_DEFS.map(subjectEntryHtml).join('')}</section>
     <section class="home-law-search">
       <label for="lawSearchInput">法令・条文・問題検索</label>
@@ -414,10 +414,10 @@ function articleSourceParagraphs(text){
   }).map(removeFinalPeriod);
 }
 function formatArticleSource(text){return articleSourceParagraphs(text).map(x=>`<p class="article-source${/^第[一二三四五六七八九十百千〇零]+条(?:の[一二三四五六七八九十百千〇零]+)?$/.test(x)?' article-number':''}">${formatNumberedParagraph(x)}</p>`).join('')}
-function openArticle(index,from='law'){articleIndex=index;returnScreen=from;setScreen('article');const law=laws[lawIndex],a=law.articles[index];app.innerHTML=`${head(a.reference)}<details class="article-card" open><summary><h2>${esc(a.reference)}</h2><span class="article-toggle" aria-hidden="true">⌃</span></summary><div class="article-content">
+function openArticle(index,from='law'){articleIndex=index;returnScreen=from;setScreen('article');const law=laws[lawIndex],a=law.articles[index],sourceHeading=a.displayType==='reference'?'■参照資料■':a.displayType==='summary'?'■条文概要■':'■条文全文■';app.innerHTML=`${head(a.reference)}<details class="article-card" open><summary><h2>${esc(a.reference)}</h2><span class="article-toggle" aria-hidden="true">⌃</span></summary><div class="article-content">
   <section class="article-block"><h3>■解説■</h3>${explanationParagraphs(a.explanations.length?a.explanations:['解説は関連問題で確認できます。'],a.sources).map(x=>`<p>${formatNumberedParagraph(toArabicNumerals(x))}</p>`).join('')}</section>
   <section class="article-block"><h3>■試験のポイント■</h3>${a.points.length?`<div class="article-points">${a.points.map(x=>`<p>${esc(toArabicNumerals(stripLeadingListNumber(removeFinalPeriod(String(x).replace(/^[・●]\s*/,'')))))}</p>`).join('')}</div>`:'<p>関連問題の解説で確認できます</p>'}</section>
-  <section class="article-block"><h3>■条文全文■</h3>${a.sources.length?a.sources.map(formatArticleSource).join(''):'<p>収録データに条文全文はありません</p>'}</section>
+  <section class="article-block"><h3>${sourceHeading}</h3>${a.sources.length?a.sources.map(formatArticleSource).join(''):'<p>収録データに本文はありません</p>'}</section>
   ${a.questionIds.length?'':`<p class="no-related">この条文の関連問題は未収録です</p>`}
   </div></details>
   <nav class="article-navigation" aria-label="条文の移動"><button onclick="LawBook.moveArticle(-1)" ${index===0?'disabled':''}>＜前へ</button><button class="article-question-button" onclick="LawBook.startRelated()" ${a.questionIds.length?'':'disabled'}>問題へ</button><button onclick="LawBook.moveArticle(1)" ${index===law.articles.length-1?'disabled':''}>次へ＞</button></nav>`}
@@ -664,7 +664,7 @@ async function registerCurrentServiceWorker(){
         .filter(registration=>legacyScopes.includes(registration.scope))
         .map(registration=>registration.unregister()));
     }
-    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.48',{updateViaCache:'none'});
+    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.56',{updateViaCache:'none'});
     const activateWaitingWorker=()=>{
       if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
     };
