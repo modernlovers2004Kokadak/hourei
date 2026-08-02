@@ -1,7 +1,7 @@
 const app=document.getElementById('app');
 const headerBack=document.getElementById('headerBack');
 const headerHome=document.getElementById('headerHome');
-const APP_VERSION='4.0.59';
+const APP_VERSION='4.0.62';
 const PROG_KEY='riyo_v05_prog';
 const BOOKMARK_KEY='riyoshi_lawbook_bookmarks_v1';
 const TODAY_KEY='riyoshi_lawbook_today10_v1';
@@ -33,6 +33,10 @@ const LAW_DEFS=[
   {id:'history',name:'文化論',color:'#6a709b',group:'non_law',categories:['history']},
   {id:'shop',name:'運営管理',color:'#3f806d',group:'non_law',categories:['shop']},
   {id:'cut',name:'カッティング',color:'#a45d4d',group:'non_law',categories:['cut','barbering_theory_general']},
+  {id:'hair_care',name:'シャンプー・整髪',color:'#a45d4d',group:'non_law',categories:['hair_care']},
+  {id:'chemical_technique',name:'パーマ・ヘアカラー',color:'#a45d4d',group:'non_law',categories:['chemical_technique']},
+  {id:'esthetic_nail',name:'理容エステティック・ネイル',color:'#a45d4d',group:'non_law',categories:['esthetic_nail']},
+  {id:'design_color',name:'ヘアデザイン・色彩',color:'#a45d4d',group:'non_law',categories:['design_color']},
   {id:'shaving',name:'シェービング',color:'#56768c',group:'non_law',categories:['shaving']}
 ];
 const SUBJECT_DEFS=[
@@ -41,7 +45,7 @@ const SUBJECT_DEFS=[
   {id:'health',name:'保健',description:'人体・皮膚の医学的基礎知識',color:'#9a6578',lawIds:['human_body','skin']},
   {id:'cosmetic_chemistry',name:'香粧品化学',description:'化粧品・薬剤の成分知識',color:'#8a6b35',lawIds:['cosmetics']},
   {id:'culture',name:'文化論',description:'歴史や文化的背景の知識',color:'#6a709b',lawIds:['history']},
-  {id:'barbering_theory',name:'理容技術理論',description:'カットやパーマなど技術の理論',color:'#a45d4d',lawIds:['cut','shaving']},
+  {id:'barbering_theory',name:'理容技術理論',description:'カットやパーマなど技術の理論',color:'#a45d4d',lawIds:['cut','hair_care','chemical_technique','esthetic_nail','design_color','shaving']},
   {id:'management',name:'運営管理',description:'経営・運営していく上で必要な知識',color:'#3f806d',lawIds:['shop']}
 ];
 const LAW_CATEGORY_IDS=new Set(LAW_DEFS.flatMap(l=>l.categories));
@@ -283,7 +287,7 @@ function renderHome(){
       <div class="home-result-legend"><span class="correct">正答 ${all.correct}</span><span class="wrong">誤答 ${all.wrong}</span><span class="unanswered">未回答 ${all.unanswered}</span></div>
     </div></section>
     <div class="today-wrap"><button class="today-start" onclick="LawBook.startToday()"><span class="check">✓</span><span><strong>${todayTitle}</strong><small>${todayCaption}</small></span></button><button class="today-bookmarks" onclick="LawBook.openBookmarks()"><span>🔖</span><span class="count">${bookmarks.size}</span></button></div>
-    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.58">新制度による筆記試験実施要領</a></div>
+    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.62">新制度による筆記試験実施要領</a></div>
     <section class="subject-list">${SUBJECT_DEFS.map(subjectEntryHtml).join('')}</section>
     <section class="home-law-search">
       <label for="lawSearchInput">法令・条文・問題検索</label>
@@ -665,7 +669,7 @@ async function registerCurrentServiceWorker(){
         .filter(registration=>legacyScopes.includes(registration.scope))
         .map(registration=>registration.unregister()));
     }
-    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.58',{updateViaCache:'none'});
+    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.62',{updateViaCache:'none'});
     const activateWaitingWorker=()=>{
       if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
     };

@@ -13682,3 +13682,45 @@ for(const question of [...QUESTIONS,...OFFICIAL_QUESTIONS]){
   const choices=MANAGEMENT_AUDIT_CHOICE_CORRECTIONS[question.id];
   if(choices)question.choices=choices;
 }
+
+// 衛生管理・消毒法（問題185～204）本監査確定
+// 厚生労働省「理容所及び美容所における衛生管理要領」第5「消毒」と
+// 理容師法施行規則第25条により、問題文、全選択肢、正答及び解説を照合済み
+const HYGIENE_DISINFECTION_REVIEWED_IDS=new Set([
+  185,186,187,188,189,190,191,192,193,194,
+  195,196,197,198,199,200,201,202,203,204
+]);
+for(const question of QUESTIONS){
+  if(!HYGIENE_DISINFECTION_REVIEWED_IDS.has(question.id))continue;
+  Object.assign(question,{
+    evidenceLevel:'A',
+    draftReview:false,
+    auditStatus:'reviewed',
+    evidenceSource:'厚生労働省「理容所及び美容所における衛生管理要領」第5「消毒」、理容師法施行規則第25条',
+    evidenceUrl:'https://www.mhlw.go.jp/web/t_doc?dataId=00ta5155&dataType=1&pageNo=1',
+    evidenceDate:'2026-08-02',
+    evidenceNote:'問題文、全選択肢、正答、解説及び根拠を問題単位で監査済み',
+    choiceReviewDate:'2026-08-02'
+  });
+}
+
+// 4.0.61で本監査を完了した追加60問の監査状態を確定
+// 問題内容及び根拠は各問題が保持する監査後の値をそのまま使用する
+const SUPPLEMENTARY_REVIEWED_IDS=new Set([
+  10073,10074,10075,10076,10077,10078,10079,10080,10081,10082,
+  10083,10084,10085,10086,10087,10088,10089,10090,10091,10092,
+  10093,10094,10095,10096,10097,10098,10099,10100,10101,10102,
+  10103,10104,10105,10106,10107,10108,10109,10110,10111,10112,
+  10113,10114,10115,10116,10117,10118,10119,10120,10121,10122,
+  10123,10124,10125,10126,10127,10128,10129,10130,10131,10132
+]);
+for(const question of OFFICIAL_QUESTIONS){
+  if(!SUPPLEMENTARY_REVIEWED_IDS.has(question.id))continue;
+  Object.assign(question,{
+    evidenceLevel:'A',
+    draftReview:false,
+    auditStatus:'reviewed',
+    evidenceDate:'2026-08-02',
+    evidenceNote:'問題文、全選択肢、正答、解説及び根拠を問題単位で監査済み'
+  });
+}
