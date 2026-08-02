@@ -1,7 +1,7 @@
 const app=document.getElementById('app');
 const headerBack=document.getElementById('headerBack');
 const headerHome=document.getElementById('headerHome');
-const APP_VERSION='4.0.58';
+const APP_VERSION='4.0.59';
 const PROG_KEY='riyo_v05_prog';
 const BOOKMARK_KEY='riyoshi_lawbook_bookmarks_v1';
 const TODAY_KEY='riyoshi_lawbook_today10_v1';
@@ -24,7 +24,7 @@ const LAW_DEFS=[
   {id:'community',name:'地域保健法',color:'#23836f',group:'law',categories:['community']},
   {id:'health_promotion_act',name:'健康増進法',color:'#3478b8',group:'law',categories:['health_promotion_act']},
   {id:'consumer',name:'消費者基本法',color:'#7059a6',group:'law',categories:['consumer']},
-  {id:'specified_commercial',name:'特定商取引法',color:'#a56a22',group:'law',categories:[],staticArticles:COMMERCIAL_LAW_ARTICLES},
+  {id:'specified_commercial',name:'特定商取引法',color:'#a56a22',group:'law',categories:['specified_commercial'],staticArticles:COMMERCIAL_LAW_ARTICLES},
   {id:'disinfection',name:'消毒法',color:'#287c96',group:'non_law',categories:['disinfection'],relatedLawId:'disinfection_law',relatedLabel:'関連法令：消毒に関する法令'},
   {id:'public_health',name:'公衆衛生',color:'#4778a8',group:'non_law',categories:['public_health']},
   {id:'human_body',name:'人体の構造及び機能',color:'#9a6578',group:'non_law',categories:['human_body']},
