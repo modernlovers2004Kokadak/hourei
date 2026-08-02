@@ -356,7 +356,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "頭蓋骨は脳を保護するとともに、顔面の形態をつくる骨格となる。",
     "themeId": "official_health_頭部の骨格"
@@ -380,7 +380,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "下顎骨は顎関節を介して運動し、咀嚼や発音などに関与する。",
     "themeId": "official_health_顔面の骨格"
@@ -404,7 +404,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "頸椎は頭部を支え、屈曲・伸展・回旋など頸部の運動に関与する。",
     "themeId": "official_health_頸部の骨格"
@@ -428,7 +428,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "表情筋は顔面の皮膚に付着し、その収縮によって表情をつくる。",
     "themeId": "official_health_表情筋"
@@ -452,7 +452,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "咬筋は代表的な咀嚼筋で、下顎骨を挙上し、歯をかみ合わせる働きをする。",
     "themeId": "official_health_咀嚼筋"
@@ -476,7 +476,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "胸鎖乳突筋は頭部・頸部の屈曲や回旋などに関与する。",
     "themeId": "official_health_頸部の筋"
@@ -500,7 +500,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "顔面神経は表情筋の運動を支配する。顔面施術では神経の走行と働きを理解することが重要である。",
     "themeId": "official_health_顔面神経"
@@ -524,7 +524,7 @@ const OFFICIAL_QUESTIONS=[
     "difficulty": "標準",
     "sourceName": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "sourceUrl": "https://www.mhlw.go.jp/content/11130500/001403710.pdf",
-    "category": "skin",
+    "category": "human_body",
     "point": "厚生労働省「理容師養成施設の教科課程の基準の運用について」・保健",
     "exp": "三叉神経は顔面の知覚を伝えるとともに、その一部は咀嚼筋の運動を担う。",
     "themeId": "official_health_三叉神経"

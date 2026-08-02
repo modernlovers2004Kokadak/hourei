@@ -1,7 +1,7 @@
 const app=document.getElementById('app');
 const headerBack=document.getElementById('headerBack');
 const headerHome=document.getElementById('headerHome');
-const APP_VERSION='4.0.56';
+const APP_VERSION='4.0.58';
 const PROG_KEY='riyo_v05_prog';
 const BOOKMARK_KEY='riyoshi_lawbook_bookmarks_v1';
 const TODAY_KEY='riyoshi_lawbook_today10_v1';
@@ -27,6 +27,7 @@ const LAW_DEFS=[
   {id:'specified_commercial',name:'特定商取引法',color:'#a56a22',group:'law',categories:[],staticArticles:COMMERCIAL_LAW_ARTICLES},
   {id:'disinfection',name:'消毒法',color:'#287c96',group:'non_law',categories:['disinfection'],relatedLawId:'disinfection_law',relatedLabel:'関連法令：消毒に関する法令'},
   {id:'public_health',name:'公衆衛生',color:'#4778a8',group:'non_law',categories:['public_health']},
+  {id:'human_body',name:'人体の構造及び機能',color:'#9a6578',group:'non_law',categories:['human_body']},
   {id:'skin',name:'皮膚',color:'#9a6578',group:'non_law',categories:['skin']},
   {id:'cosmetics',name:'香粧品',color:'#8a6b35',group:'non_law',categories:['cosmetics']},
   {id:'history',name:'文化論',color:'#6a709b',group:'non_law',categories:['history']},
@@ -37,7 +38,7 @@ const LAW_DEFS=[
 const SUBJECT_DEFS=[
   {id:'regulations',name:'関係法規・制度',description:'理容業に関する法律・資格制度の知識',color:'#e97824',lawIds:['barber_related','consumer','specified_commercial']},
   {id:'hygiene',name:'衛生管理',description:'公衆衛生・環境衛生など、感染症予防の知識',color:'#287c96',lawIds:['disinfection_law','infection','community','health_promotion_act','disinfection','public_health']},
-  {id:'health',name:'保健',description:'人体・皮膚の医学的基礎知識',color:'#9a6578',lawIds:['skin']},
+  {id:'health',name:'保健',description:'人体・皮膚の医学的基礎知識',color:'#9a6578',lawIds:['human_body','skin']},
   {id:'cosmetic_chemistry',name:'香粧品化学',description:'化粧品・薬剤の成分知識',color:'#8a6b35',lawIds:['cosmetics']},
   {id:'culture',name:'文化論',description:'歴史や文化的背景の知識',color:'#6a709b',lawIds:['history']},
   {id:'barbering_theory',name:'理容技術理論',description:'カットやパーマなど技術の理論',color:'#a45d4d',lawIds:['cut','shaving']},
@@ -282,7 +283,7 @@ function renderHome(){
       <div class="home-result-legend"><span class="correct">正答 ${all.correct}</span><span class="wrong">誤答 ${all.wrong}</span><span class="unanswered">未回答 ${all.unanswered}</span></div>
     </div></section>
     <div class="today-wrap"><button class="today-start" onclick="LawBook.startToday()"><span class="check">✓</span><span><strong>${todayTitle}</strong><small>${todayCaption}</small></span></button><button class="today-bookmarks" onclick="LawBook.openBookmarks()"><span>🔖</span><span class="count">${bookmarks.size}</span></button></div>
-    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.56">新制度による筆記試験実施要領</a></div>
+    <div class="section-title-row"><h2 class="section-title">筆記試験科目</h2><a class="exam-guide-link" href="./preview.html?v=4.0.58">新制度による筆記試験実施要領</a></div>
     <section class="subject-list">${SUBJECT_DEFS.map(subjectEntryHtml).join('')}</section>
     <section class="home-law-search">
       <label for="lawSearchInput">法令・条文・問題検索</label>
@@ -664,7 +665,7 @@ async function registerCurrentServiceWorker(){
         .filter(registration=>legacyScopes.includes(registration.scope))
         .map(registration=>registration.unregister()));
     }
-    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.56',{updateViaCache:'none'});
+    const registration=await navigator.serviceWorker.register('./sw.js?v=4.0.58',{updateViaCache:'none'});
     const activateWaitingWorker=()=>{
       if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
     };
